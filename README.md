@@ -1,0 +1,1160 @@
+[index.html](https://github.com/user-attachments/files/34062581/index.html)
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NA2 Study Master - 네트워크관리사 2급 통합 학습 대시보드</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <style>
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .hero-gradient { background: linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 55%, #0f172a 100%); }
+    .card-hover { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .card-hover:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <!-- 상단 고정 헤더 -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-extrabold text-sm text-white shadow-lg shadow-indigo-600/30">
+          N2
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-extrabold text-white tracking-tight">NA2 Study Master</h1>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              네트워크관리사 2급 · 개인 학습 기록
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">이론 · 필기 · 실기 · 오답노트 · 로컬 브라우저 레코드 통합 솔루션</p>
+        </div>
+      </div>
+
+      <!-- 우측 상태 및 타이머 바 -->
+      <div class="flex items-center gap-2.5 text-xs">
+        <div class="px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-slate-300">통학 타이머</span>
+          <span id="topTimer" class="font-mono font-bold text-emerald-400">20:00</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1.5">
+          <span class="text-slate-400">전체 정답률</span>
+          <span id="topAccuracy" class="font-mono font-bold text-indigo-400">0%</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-1.5">
+          <span class="text-slate-400">오답노트</span>
+          <span id="topWrongBadge" class="font-mono font-bold text-rose-400">0</span>
+        </div>
+        <button id="btnResetAll" class="px-3 py-1.5 rounded-full bg-rose-950/70 hover:bg-rose-900 text-rose-300 border border-rose-800/60 font-semibold">
+          초기화
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <main class="max-w-6xl mx-auto px-6 py-6 space-y-6">
+
+    <!-- 상단 히어로 배너 -->
+    <section class="hero-gradient rounded-3xl p-7 sm:p-8 border border-indigo-500/30 shadow-2xl relative overflow-hidden">
+      <div class="relative z-10 max-w-3xl space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-bold uppercase tracking-wider">
+          <span>MY LEARNING SPACE</span>
+          <span>·</span>
+          <span>통학 20분 1-DAY 문제은행</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+          오늘의 학습을 점수와 기록으로 확인하세요.<br />
+          <span class="text-indigo-300 text-xl sm:text-2xl font-bold">네트워크관리사 2급 합격을 위한 최적의 학습 솔루션</span>
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          이론 · 필기 · 실기 진행 상태를 한 곳에서 관리하고, 문제 풀이 시 정·오답 해설과 연계 이론 문제를 즉시 풀어보며 브라우저 로컬 레코드로 합격률을 분석합니다.
+        </p>
+        <div class="pt-2 flex flex-wrap gap-3">
+          <button onclick="app.switchTab('written')" class="px-5 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-sm shadow-lg shadow-indigo-600/30">
+            🚀 필기 집중 학습 시작하기
+          </button>
+          <button onclick="app.switchTab('practical')" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm">
+            💻 실기 작업형/단답형 실습
+          </button>
+          <button onclick="app.switchTab('theory')" class="px-5 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-sm border border-slate-600">
+            📖 과목별 핵심 이론 보기
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4대 핵심 요약 KPI 카드 -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start justify-between">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold text-slate-400">전체 정답률</p>
+          <p id="kpiAccuracy" class="text-3xl font-extrabold font-mono text-white">0%</p>
+          <p id="kpiAccuracyDesc" class="text-xs text-slate-500">아직 풀이 기록이 없습니다</p>
+        </div>
+        <span class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-lg">☑️</span>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start justify-between">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold text-slate-400">오늘 푼 문제</p>
+          <p id="kpiSolvedCount" class="text-3xl font-extrabold font-mono text-white">0</p>
+          <p id="kpiSolvedDesc" class="text-xs text-slate-500">로컬 브라우저 기록 기준</p>
+        </div>
+        <span class="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 text-lg">🎯</span>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start justify-between">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold text-slate-400">오답노트 복습 대상</p>
+          <p id="kpiWrongCount" class="text-3xl font-extrabold font-mono text-rose-400">0</p>
+          <p id="kpiGraduatedDesc" class="text-xs text-slate-500">2회 연속 정답 졸업: 0건</p>
+        </div>
+        <span class="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 text-lg">❗</span>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start justify-between">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold text-slate-400">이론 마스터 & 합격 판독</p>
+          <p id="kpiPassStatus" class="text-xl font-extrabold text-amber-400 mt-1">학습 대기중</p>
+          <p id="kpiTheoryDesc" class="text-xs text-slate-500">이론 확인문제 마스터: 0 / 8</p>
+        </div>
+        <span class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 text-lg">🏆</span>
+      </div>
+    </section>
+
+    <!-- 6대 메인 네비게이션 탭 바 (대시보드 | 이론 | 필기 | 실기 | 오답노트 | 학습 기록) -->
+    <nav class="flex flex-wrap items-center gap-2 bg-slate-900 p-2 rounded-2xl border border-slate-800">
+      <button data-tab="dashboard" class="main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white transition">
+        📊 대시보드
+      </button>
+      <button data-tab="theory" class="main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:bg-slate-800 transition">
+        📖 이론
+      </button>
+      <button data-tab="written" class="main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:bg-slate-800 transition">
+        ✍️ 필기
+      </button>
+      <button data-tab="practical" class="main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:bg-slate-800 transition">
+        💻 실기
+      </button>
+      <button data-tab="wrongnote" class="main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:bg-slate-800 transition flex items-center gap-1.5">
+        <span>🚨 오답노트</span>
+        <span id="navWrongCount" class="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 font-mono text-xs">0</span>
+      </button>
+      <button data-tab="records" class="main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:bg-slate-800 transition">
+        🗂️ 학습 기록
+      </button>
+    </nav>
+
+    <!-- =======================================================================
+         [1] 📊 대시보드 뷰 (3단 솔루션 카드 + 학습 현황 영역별 정답률 + 실시간 서브넷 계산기)
+         ======================================================================= -->
+    <section id="view-dashboard" class="space-y-6">
+
+      <!-- 3단 핵심 학습 모듈 카드 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- 카드 1: 필기 집중 학습 -->
+        <div class="card-hover p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold">
+              ✍️
+            </div>
+            <h3 class="text-lg font-bold text-white">필기 집중 학습</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              네트워크 일반, TCP/IP, NOS, 네트워크 운용기기 4개 과목 기출문제를 풀고 정·오답 즉시 연계된 이론 문제를 함께 정복합니다.
+            </p>
+            <ul class="text-xs text-slate-300 space-y-1.5 pt-1">
+              <li>• 과목별 필터링 및 실전 4지선다 CBT</li>
+              <li>• 문제 정답/오답 시 핵심 이론 미니퀴즈 즉시 연동</li>
+              <li>• 60점 합격 기준선 실시간 판독</li>
+            </ul>
+          </div>
+          <button onclick="app.switchTab('written')" class="w-full py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-bold text-xs transition">
+            필기 문제 풀기 →
+          </button>
+        </div>
+
+        <!-- 카드 2: 실기 작업형/단답형 -->
+        <div class="card-hover p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">
+              💻
+            </div>
+            <h3 class="text-lg font-bold text-white">실기 작업형/단답형</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Cisco 라우터 CLI 명령어 입력 에뮬레이터, Linux 명령어, UTP 케이블(T568A/B) 배열 및 Windows Server 작업을 실습합니다.
+            </p>
+            <ul class="text-xs text-slate-300 space-y-1.5 pt-1">
+              <li>• Router# 실전 터미널 명령어 채점 (축약어 지원)</li>
+              <li>• T568B 다이렉트/크로스 케이블 선 배열 실습</li>
+              <li>• Windows Server & Linux 서버 설정 문제 수록</li>
+            </ul>
+          </div>
+          <button onclick="app.switchTab('practical')" class="w-full py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 font-bold text-xs transition">
+            실기 실습 시작 →
+          </button>
+        </div>
+
+        <!-- 카드 3: 스마트 오답 시스템 -->
+        <div class="card-hover p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold">
+              🧠
+            </div>
+            <h3 class="text-lg font-bold text-white">스마트 오답 시스템</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              틀린 문제와 '헷갈림(⭐)' 체크 문항을 자동 수집하며, 반복 복습에서 2회 연속 정답 달성 시 오답노트에서 자동 졸업 처리합니다.
+            </p>
+            <ul class="text-xs text-slate-300 space-y-1.5 pt-1">
+              <li>• 필기·실기 오답 자동 기록 및 취약 과목 분석</li>
+              <li>• 로컬 브라우저(LocalStorage) 영구 보존</li>
+              <li>• 학습 기록 JSON 내보내기 / 불러오기 지원</li>
+            </ul>
+          </div>
+          <button onclick="app.switchTab('wrongnote')" class="w-full py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 font-bold text-xs transition">
+            오답노트 복습하기 →
+          </button>
+        </div>
+      </div>
+
+      <!-- 하단 2단 섹션: OVERVIEW 학습 현황 (영역별 정답률) + 실시간 IP 서브넷 계산기 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- 좌측 7컬럼: OVERVIEW 학습 현황 (이론 / 필기 / 실기 영역별 정답률) -->
+        <div class="lg:col-span-7 p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">OVERVIEW</span>
+              <h3 class="text-lg font-extrabold text-white">학습 현황 · 영역별 정답률</h3>
+              <p class="text-xs text-slate-400">누적 점수와 풀이 이력을 바탕으로 실시간 계산됩니다.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-xs font-mono font-bold">
+              Accuracy
+            </span>
+          </div>
+
+          <!-- 이론 / 필기 / 실기 대분류 정답률 바 -->
+          <div id="overviewMainBars" class="space-y-4 pt-1"></div>
+
+          <!-- 세부 과목별 정답률 바 -->
+          <div class="pt-4 border-t border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold text-slate-400 uppercase">세부 과목별 학습 진도 및 정답률</h4>
+            <div id="overviewSubBars" class="space-y-2.5 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- 우측 5컬럼: 실시간 IP 서브넷 계산기 (사진 상단 기능 완벽 구현) -->
+        <div class="lg:col-span-5 p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider">SUBNET TOOL</span>
+              <span class="text-xs text-slate-400 font-mono">2과목 TCP/IP & 실기 대비</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-white">🧮 실시간 IP 서브넷 계산기</h3>
+            <p class="text-xs text-slate-400">IP 주소와 CIDR 프리픽스를 입력하면 네트워크 ID, 브로드캐스트, 가용 호스트 범위를 즉시 계산합니다.</p>
+
+            <!-- 입력 폼 (192.168.100.128 / 26 [계산 실행]) -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-2">
+              <input id="subnetIpInput" type="text" value="192.168.100.128"
+                class="w-full sm: flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 font-mono text-sm text-white focus:border-indigo-500 outline-none"
+                placeholder="예: 192.168.100.128" />
+              <span class="text-slate-400 font-mono font-bold">/</span>
+              <input id="subnetCidrInput" type="number" min="24" max="30" value="26"
+                class="w-16 px-2.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 font-mono text-sm text-cyan-300 text-center outline-none" />
+              <button id="btnRunSubnetCalc" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shrink-0 shadow">
+                계산 실행
+              </button>
+            </div>
+
+            <!-- 계산 결과 출력 영역 -->
+            <div id="subnetResultBox" class="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs space-y-2 text-slate-200"></div>
+          </div>
+
+          <!-- 8비트 암산 토글 바 -->
+          <div class="pt-3 border-t border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">8비트 2진수 합산기 (터치하여 ON/OFF)</span>
+              <span class="font-mono font-bold text-emerald-400">합계: <strong id="bitSumVal">192</strong></span>
+            </div>
+            <div id="bitToggleRow" class="grid grid-cols-8 gap-1"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         [2] 📖 이론 탭 (필기 4과목 + 실기 핵심 이론 노트 & 즉시 확인 문제)
+         ======================================================================= -->
+    <section id="view-theory" class="hidden space-y-4">
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg font-bold text-white">📖 필기·실기 핵심 이론 & 확인 문제 풀이</h3>
+          <p class="text-xs text-slate-400">각 이론 카드의 확인 문제를 풀면 대시보드의 '이론 정답률'과 학습 기록에 즉시 반영됩니다.</p>
+        </div>
+        <div class="flex flex-wrap gap-1.5" id="theoryFilterGroup">
+          <button data-tfilter="ALL" class="tfilter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">전체</button>
+          <button data-tfilter="S1_NET" class="tfilter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">1과목: 네트워크일반</button>
+          <button data-tfilter="S2_TCPIP" class="tfilter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">2과목: TCP/IP</button>
+          <button data-tfilter="S3_NOS" class="tfilter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">3과목: NOS</button>
+          <button data-tfilter="S4_HW" class="tfilter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">4과목: 운용기기</button>
+          <button data-tfilter="P_PRACTICAL" class="tfilter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-cyan-300">💻 실기 이론</button>
+        </div>
+      </div>
+      <div id="theoryListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- =======================================================================
+         [3] ✍️ 필기 탭 (과목별 CBT 문제 풀이 + 정·오답 시 연계 이론 문제 풀이)
+         ======================================================================= -->
+    <section id="view-written" class="hidden space-y-4">
+      <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap gap-1.5">
+          <button data-wsub="ALL" class="wsub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">전 과목</button>
+          <button data-wsub="S1_NET" class="wsub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">1과목: 네트워크일반</button>
+          <button data-wsub="S2_TCPIP" class="wsub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">2과목: TCP/IP</button>
+          <button data-wsub="S3_NOS" class="wsub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">3과목: NOS</button>
+          <button data-wsub="S4_HW" class="wsub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">4과목: 운용기기</button>
+        </div>
+        <span id="writtenCounter" class="text-xs font-mono font-bold text-indigo-300">문항 1 / 8</span>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span id="writtenCatBadge" class="px-2.5 py-1 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-700/50 text-xs font-bold">1과목</span>
+            <span id="writtenStatBadge" class="text-xs font-mono text-slate-400">첫 풀이</span>
+          </div>
+          <button id="btnWrittenBookmark" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-slate-700">
+            ⭐ 헷갈림 체크
+          </button>
+        </div>
+
+        <h3 id="writtenQText" class="text-lg font-bold text-white leading-relaxed"></h3>
+        <div id="writtenCodeBox" class="hidden p-3.5 rounded-xl bg-slate-950 border border-cyan-800/50 font-mono text-xs text-cyan-300"></div>
+
+        <div id="writtenChoicesBox" class="space-y-2.5"></div>
+
+        <!-- 정·오답 시 즉시 열리는 해설 + 연계 이론 노트 + 미니 이론 문제 -->
+        <div id="writtenFeedbackBox" class="hidden pt-4 border-t border-slate-800 space-y-4"></div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+          <button id="btnWrittenPrev" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">◀ 이전 문제</button>
+          <button id="btnWrittenNext" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">다음 문제 ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         [4] 💻 실기 탭 (Router CLI 터미널 & 케이블링/서버 작업형 + 연계 이론 문제)
+         ======================================================================= -->
+    <section id="view-practical" class="hidden space-y-4">
+      <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap gap-1.5">
+          <button data-psub="ALL" class="psub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 text-white">전체 실기</button>
+          <button data-psub="CLI_ROUTER" class="psub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">🖥️ Router IOS CLI</button>
+          <button data-psub="CLI_LINUX" class="psub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">🐧 Linux 단답형</button>
+          <button data-psub="WORK_SIM" class="psub-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">🔌 케이블링 & Windows Server</button>
+        </div>
+        <span id="practicalCounter" class="text-xs font-mono font-bold text-cyan-300">실습 1 / 5</span>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span id="practicalCatBadge" class="px-2.5 py-1 rounded-md bg-cyan-950 text-cyan-300 border border-cyan-700/50 text-xs font-bold">실기</span>
+            <span id="practicalStatBadge" class="text-xs font-mono text-slate-400">첫 실습</span>
+          </div>
+          <button id="btnPracticalBookmark" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-slate-700">
+            ⭐ 헷갈림 체크
+          </button>
+        </div>
+
+        <h3 id="practicalQText" class="text-lg font-bold text-white leading-relaxed"></h3>
+        <div id="practicalScenario" class="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300 whitespace-pre-line"></div>
+
+        <!-- CLI 입력 영역 -->
+        <div id="practicalCliArea" class="hidden space-y-3">
+          <div class="p-4 rounded-xl bg-black border border-slate-700 font-mono text-sm space-y-2">
+            <div class="text-xs text-slate-500">Cisco IOS / Linux CLI Terminal (축약어 지원: 예 no sh, copy r s)</div>
+            <div class="flex items-center gap-2">
+              <span id="cliPrompt" class="text-emerald-400 font-bold shrink-0">Router#</span>
+              <input id="cliInput" type="text" class="bg-transparent border-none outline-none text-emerald-300 w-full font-mono" placeholder="명령어를 입력하고 Enter 또는 [채점 실행] 클릭..." autocomplete="off" />
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button id="btnEvalCli" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-bold text-white">⚡ 명령어 채점 실행</button>
+            <button id="btnHintCli" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 border border-slate-700">💡 힌트 보기</button>
+          </div>
+          <p id="cliHintBox" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-700/50 text-amber-300 text-xs font-mono"></p>
+        </div>
+
+        <!-- 작업 선택형 영역 -->
+        <div id="practicalChoiceArea" class="hidden space-y-2.5"></div>
+
+        <!-- 실기 정·오답 시 즉시 열리는 해설 + 연계 이론 노트 + 미니 이론 문제 -->
+        <div id="practicalFeedbackBox" class="hidden pt-4 border-t border-slate-800 space-y-4"></div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+          <button id="btnPracticalPrev" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">◀ 이전 실습</button>
+          <button id="btnPracticalNext" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-bold text-white">다음 실습 ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         [5] 🚨 오답노트 탭 (미졸업 오답 / 헷갈림 북마크 / 2회 연속 정답 졸업 완료)
+         ======================================================================= -->
+    <section id="view-wrongnote" class="hidden space-y-4">
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg font-bold text-white">🚨 스마트 오답 노트 & 졸업 관리</h3>
+          <p class="text-xs text-slate-400">틀린 문제나 헷갈림 체크 문제를 다시 풀어 2회 연속 정답을 맞히면 자동 졸업 처리됩니다.</p>
+        </div>
+        <div class="flex gap-2">
+          <button data-wmode="ACTIVE" class="wmode-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white">복습 필요 오답</button>
+          <button data-wmode="MASTERED" class="wmode-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-emerald-300">🎓 졸업 완료</button>
+        </div>
+      </div>
+      <div id="wrongListBox" class="space-y-3"></div>
+    </section>
+
+    <!-- =======================================================================
+         [6] 🗂️ 학습 기록 탭 (로컬 브라우저 레코드 타임라인 & JSON 백업/복원)
+         ======================================================================= -->
+    <section id="view-records" class="hidden space-y-4">
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg font-bold text-white">🗂️ 로컬 브라우저 학습 기록 (LocalStorage Records)</h3>
+          <p class="text-xs text-slate-400">문제 풀이 시각, 정·오답 결과, 연계 이론 마스터 내역이 브라우저에 실시간 기록됩니다.</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnExportJson" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">📤 JSON 백업 복사</button>
+          <button id="btnImportJson" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700">📥 JSON 복원</button>
+        </div>
+      </div>
+      <div id="recordsTimelineBox" class="space-y-2"></div>
+    </section>
+
+  </main>
+
+  <script>
+    const DB = {
+      theories: {
+        "TH_OSI7": {
+          id: "TH_OSI7", category: "S1_NET", categoryName: "1과목: 네트워크 일반",
+          title: "OSI 7계층 구조와 계층별 전송 단위(PDU)",
+          summary: "1계층 물리(Bit) → 2계층 데이터링크(Frame, MAC 주소) → 3계층 네트워크(Packet, IP 주소/라우팅) → 4계층 전송(Segment, Port/TCP·UDP).",
+          points: ["2계층(데이터링크): 브리지, 스위치 / MAC 주소 기반 Frame 전송 및 오류 제어", "3계층(네트워크): 라우터 / IP 주소 기반 최적 경로 라우팅", "4계층(전송): TCP(연결지향·신뢰성) vs UDP(비연결성·실시간 고속 전송)"],
+          quiz: { q: "[이론 확인] OSI 7계층 중 MAC 주소를 사용하며 데이터 전송 단위가 'Frame(프레임)'인 계층은?", opts: ["1계층 물리 계층", "2계층 데이터링크 계층", "3계층 네트워크 계층"], ans: 1, exp: "데이터링크 계층(2계층)은 Frame 단위로 전송하며 MAC 주소를 사용합니다." }
+        },
+        "TH_CSMA": {
+          id: "TH_CSMA", category: "S1_NET", categoryName: "1과목: 네트워크 일반",
+          title: "매체 접근 제어: CSMA/CD vs CSMA/CA",
+          summary: "유선 이더넷(IEEE 802.3)은 충돌을 감지하는 CSMA/CD를 사용하고, 무선 LAN(IEEE 802.11)은 충돌을 사전에 회피하는 CSMA/CA를 사용합니다.",
+          points: ["CSMA/CD: 충돌 발생 시 Jam 신호 송출 후 랜덤 시간 대기(Back-off) 후 재전송", "CSMA/CA: 무선 환경에서 RTS/CTS 프레임으로 충돌 사전 회피"],
+          quiz: { q: "[이론 확인] 무선 LAN(IEEE 802.11)에서 데이터 충돌을 사전에 회피하기 위해 사용하는 방식은?", opts: ["CSMA/CD", "CSMA/CA", "Token Ring"], ans: 1, exp: "무선 LAN은 충돌 회피 방식인 CSMA/CA를 사용합니다." }
+        },
+        "TH_SUBNET": {
+          id: "TH_SUBNET", category: "S2_TCPIP", categoryName: "2과목: TCP/IP",
+          title: "IPv4 서브넷팅 & CIDR 가용 호스트 계산 공식",
+          summary: "C클래스(/24) 기준 마지막 옥텟(8비트)에서 1의 개수가 서브넷 비트(n), 0의 개수가 호스트 비트(h)입니다.",
+          points: ["분할 서브넷 수 = 2^n 개 / 서브넷당 가용 호스트 수 = (2^h - 2) 개", "/25(.128, 호스트 126개), /26(.192, 62개), /27(.224, 30개), /28(.240, 14개)"],
+          quiz: { q: "[이론 확인] /26 (255.255.255.192) 서브넷 마스크에서 서브넷당 가용 호스트 수는?", opts: ["30개", "62개", "126개"], ans: 1, exp: "/26은 호스트 비트가 6개이므로 2^6 - 2 = 62개입니다." }
+        },
+        "TH_ARP": {
+          id: "TH_ARP", category: "S2_TCPIP", categoryName: "2과목: TCP/IP",
+          title: "ARP / RARP 프로토콜 및 필수 포트 번호",
+          summary: "논리적 IP 주소를 물리적 MAC 주소로 변환하는 프로토콜은 ARP이며, 반대는 RARP입니다.",
+          points: ["ARP: IP → MAC 변환 / RARP: MAC → IP 변환 / ICMP: 오류 보고 및 ping 테스트", "필수 포트: FTP(20,21), SSH(22), Telnet(23), SMTP(25), DNS(53), HTTP(80), HTTPS(443)"],
+          quiz: { q: "[이론 확인] 논리적 IP 주소를 물리적 MAC 주소로 변환하는 프로토콜은?", opts: ["ARP", "RARP", "ICMP"], ans: 0, exp: "ARP(Address Resolution Protocol)가 IP를 MAC 주소로 변환합니다." }
+        },
+        "TH_LINUX": {
+          id: "TH_LINUX", category: "S3_NOS", categoryName: "3과목: NOS",
+          title: "Linux 권한 설정(chmod) 및 핵심 네트워크 설정 파일",
+          summary: "소유자(User)·그룹(Group)·기타(Other)에 대해 읽기(r=4), 쓰기(w=2), 실행(x=1) 권한을 합산하여 부여합니다.",
+          points: ["chmod 750: 소유자 rwx(7), 그룹 r-x(5), 기타 ---(0)", "/etc/resolv.conf: DNS 네임서버 IP 지정 / /etc/hosts: 호스트명-IP 매핑"],
+          quiz: { q: "[이론 확인] Linux에서 DNS 서버 IP 주소(nameserver)를 설정하는 파일 경로는?", opts: ["/etc/fstab", "/etc/resolv.conf", "/etc/passwd"], ans: 1, exp: "/etc/resolv.conf 파일에 nameserver 주소를 등록합니다." }
+        },
+        "TH_DEVICE": {
+          id: "TH_DEVICE", category: "S4_HW", categoryName: "4과목: 네트워크 운용기기",
+          title: "네트워크 운용기기 (라우터 · 스위치 · VLAN)",
+          summary: "스위치(2계층)는 충돌 도메인을 나누고, 라우터(3계층)와 VLAN은 브로드캐스트 도메인을 분할합니다.",
+          points: ["라우터(3계층): 서로 다른 네트워크 연결 및 최적 경로 설정", "VLAN: 물리적 위치와 무관하게 스위치 포트를 논리적으로 묶어 브로드캐스트 도메인 분할"],
+          quiz: { q: "[이론 확인] 스위치 포트를 논리적으로 그룹화하여 브로드캐스트 도메인을 분할하는 기술은?", opts: ["VLAN", "NAT", "VPN"], ans: 0, exp: "VLAN(가상 랜)은 논리적으로 브로드캐스트 도메인을 분리합니다." }
+        },
+        "TH_CABLE": {
+          id: "TH_CABLE", category: "P_PRACTICAL", categoryName: "실기 핵심이론",
+          title: "[실기 작업형] UTP 케이블 T568A/B 배열 및 Windows Server",
+          summary: "실기 1번 필수 문제인 다이렉트(T568B-T568B) 및 크로스(T568B-T568A) 케이블 선 배열 공식입니다.",
+          points: ["T568B 표준: 1.주띠 - 2.주 - 3.녹띠 - 4.파 - 5.파띠 - 6.녹 - 7.갈띠 - 8.갈", "다이렉트(이종 장비: PC-스위치) / 크로스(동종 장비: PC-PC, 라우터-라우터)"],
+          quiz: { q: "[이론 확인] T568B 표준 배열에서 1번~3번 핀의 색상 순서로 올바른 것은?", opts: ["주띠 - 주 - 녹띠", "녹띠 - 녹 - 주띠", "주띠 - 녹띠 - 파"], ans: 0, exp: "T568B는 주띠-주-녹띠-파-파띠-녹-갈띠-갈 순서입니다." }
+        },
+        "TH_ROUTER": {
+          id: "TH_ROUTER", category: "P_PRACTICAL", categoryName: "실기 핵심이론",
+          title: "[실기 에뮬레이터] Cisco Router IOS 필수 명령어",
+          summary: "인터페이스 설정 후 활성화(no shutdown)와 관리자 모드에서 설정 저장(copy r s)이 핵심입니다.",
+          points: ["enable → configure terminal (conf t) → interface fastethernet 0/0", "ip address [IP] [Mask] → no shutdown (no sh)", "저장: copy running-config startup-config (축약: copy r s)"],
+          quiz: { q: "[이론 확인] 라우터 현재 실행 설정(RAM)을 NVRAM에 영구 저장하는 명령어는?", opts: ["copy startup-config running-config", "copy running-config startup-config", "show running-config"], ans: 1, exp: "copy running-config startup-config (copy r s) 명령어로 저장합니다." }
+        }
+      },
+
+      written: [
+        { id: "WQ_01", sub: "S1_NET", subName: "1과목: 네트워크 일반", theoryId: "TH_OSI7", q: "OSI 7계층 중 프레임(Frame) 단위의 데이터 전송 및 MAC 주소를 이용한 물리적 주소 지정을 담당하는 계층은?", code: null, choices: ["물리 계층", "데이터링크 계층", "네트워크 계층", "전송 계층"], ans: 1, exp: "2계층 데이터링크 계층은 Frame 단위 전송과 MAC 주소 지정을 담당합니다." },
+        { id: "WQ_02", sub: "S1_NET", subName: "1과목: 네트워크 일반", theoryId: "TH_CSMA", q: "유선 이더넷(IEEE 802.3) 환경에서 충돌 감지 시 Jam 신호를 송출하고 임의의 시간 대기 후 재전송하는 매체 접근 제어 방식은?", code: null, choices: ["CSMA/CA", "CSMA/CD", "Token Ring", "FDDI"], ans: 1, exp: "유선 이더넷은 충돌 탐지 방식인 CSMA/CD를 사용합니다." },
+        { id: "WQ_03", sub: "S2_TCPIP", subName: "2과목: TCP/IP", theoryId: "TH_SUBNET", q: "C클래스 네트워크(192.168.100.0)를 255.255.255.192(/26) 서브넷 마스크로 분할했을 때 서브넷당 사용 가능한 호스트 수는?", code: "Subnet Mask: 255.255.255.192 (/26)", choices: ["14개", "30개", "62개", "126개"], ans: 2, exp: "192는 11000000이므로 호스트 비트(0)가 6개입니다. 2^6 - 2 = 62개입니다." },
+        { id: "WQ_04", sub: "S2_TCPIP", subName: "2과목: TCP/IP", theoryId: "TH_ARP", q: "TCP/IP 네트워크에서 논리적인 IP 주소를 물리적인 하드웨어 주소(MAC Address)로 변환해 주는 프로토콜은?", code: null, choices: ["RARP", "ICMP", "ARP", "IGMP"], ans: 2, exp: "ARP는 IP 주소를 MAC 주소로 변환하는 프로토콜입니다." },
+        { id: "WQ_05", sub: "S3_NOS", subName: "3과목: NOS", theoryId: "TH_LINUX", q: "Linux 시스템에서 'app.sh' 파일의 권한을 소유자는 rwx, 그룹은 r-x, 기타 사용자는 권한 없음으로 설정하는 명령어는?", code: "$ chmod [권한번호] app.sh", choices: ["chmod 750 app.sh", "chmod 755 app.sh", "chmod 640 app.sh", "chmod 700 app.sh"], ans: 0, exp: "소유자 7(4+2+1), 그룹 5(4+1), 기타 0이므로 chmod 750입니다." },
+        { id: "WQ_06", sub: "S3_NOS", subName: "3과목: NOS", theoryId: "TH_LINUX", q: "Linux 시스템에서 도메인 이름을 IP 주소로 변환하기 위해 질의할 DNS 네임서버 주소를 등록하는 설정 파일은?", code: "nameserver 168.126.63.1", choices: ["/etc/hosts", "/etc/resolv.conf", "/etc/fstab", "/etc/passwd"], ans: 1, exp: "/etc/resolv.conf 파일에 nameserver 지시자로 DNS 서버 IP를 설정합니다." },
+        { id: "WQ_07", sub: "S4_HW", subName: "4과목: 네트워크 운용기기", theoryId: "TH_DEVICE", q: "OSI 3계층 장비로 브로드캐스트 도메인을 분할하며 서로 다른 네트워크 간 최적의 경로를 설정해 패킷을 전달하는 장비는?", code: null, choices: ["리피터", "더미 허브", "브리지", "라우터"], ans: 3, exp: "라우터(Router)는 3계층 장비로 브로드캐스트 도메인을 분할하고 라우팅을 수행합니다." },
+        { id: "WQ_08", sub: "S4_HW", subName: "4과목: 네트워크 운용기기", theoryId: "TH_DEVICE", q: "물리적 위치와 상관없이 스위치 포트를 논리적으로 그룹화하여 브로드캐스트 도메인을 분할하는 기술은?", code: null, choices: ["VLAN", "NAT", "VPN", "STP"], ans: 0, exp: "VLAN(가상 랜)은 스위치 내부에서 논리적으로 브로드캐스트 도메인을 분리합니다." }
+      ],
+
+      practical: [
+        { id: "PQ_01", pType: "CLI_ROUTER", pTypeName: "실기: Router CLI", theoryId: "TH_ROUTER", q: "[라우터 실습 1] FastEthernet 0/0 인터페이스 설정 모드에서 포트를 활성화(켜기)하는 명령어를 입력하세요.", scenario: "현재 프롬프트: Router(config-if)#\nIP 주소 설정 후 인터페이스를 Up 상태로 활성화해야 합니다.", prompt: "Router(config-if)#", cmds: ["no shutdown", "no shut", "no sh"], hint: "shutdown의 반대 명령어 (no ...)", exp: "'no shutdown'(축약: no sh)을 입력해야 인터페이스가 활성화됩니다." },
+        { id: "PQ_02", pType: "CLI_ROUTER", pTypeName: "실기: Router CLI", theoryId: "TH_ROUTER", q: "[라우터 실습 2] 관리자 모드(Router#)에서 현재 실행 설정(RAM)을 NVRAM에 영구 저장하는 명령어를 입력하세요.", scenario: "현재 프롬프트: Router#\n모든 라우터 설정 완료 후 반드시 저장해야 채점됩니다.", prompt: "Router#", cmds: ["copy running-config startup-config", "copy run start", "copy r s", "write memory", "wr"], hint: "copy [현재설정] [시작설정] 또는 축약어 copy r s", exp: "'copy running-config startup-config'(축약: copy r s)로 NVRAM에 저장합니다." },
+        { id: "PQ_03", pType: "CLI_LINUX", pTypeName: "실기: Linux 명령어", theoryId: "TH_LINUX", q: "[Linux 단답형] 현재 시스템의 모든 네트워크 연결 상태(-a)와 포트 번호를 숫자(-n)로 출력하는 netstat 명령어를 입력하세요.", scenario: "관리자가 리눅스 서버에서 열린 포트와 연결 상태를 숫자로 확인하려 합니다.", prompt: "[root@icqa ~]#", cmds: ["netstat -an", "netstat -na", "ss -an"], hint: "netstat 명령어에 -a 와 -n 옵션 결합", exp: "'netstat -an'은 모든 소켓(-a)을 숫자 주소(-n)로 출력합니다." },
+        { id: "PQ_04", pType: "WORK_SIM", pTypeName: "실기: 케이블링 & 서버", theoryId: "TH_CABLE", q: "[케이블 제작 실기] PC와 스위치를 연결하는 다이렉트 케이블(T568B 표준)의 1번~8번 핀 색상 배열을 선택하세요.", scenario: "이종 장비 연결 시 양쪽 모두 T568B 표준으로 배열합니다.", choices: ["1.주띠 - 2.주 - 3.녹띠 - 4.파 - 5.파띠 - 6.녹 - 7.갈띠 - 8.갈", "1.주띠 - 2.주 - 3.녹띠 - 4.녹 - 5.파띠 - 6.파 - 7.갈띠 - 8.갈", "1.녹띠 - 2.녹 - 3.주띠 - 4.파 - 5.파띠 - 6.주 - 7.갈띠 - 8.갈", "1.주띠 - 2.주 - 3.파띠 - 4.파 - 5.녹띠 - 6.녹 - 7.갈띠 - 8.갈"], ans: 0, exp: "T568B 표준은 [주띠-주-녹띠-파-파띠-녹-갈띠-갈] 순서입니다." },
+        { id: "PQ_05", pType: "WORK_SIM", pTypeName: "실기: 케이블링 & 서버", theoryId: "TH_ARP", q: "[Windows Server 실기] DNS 서버에서 IP 주소를 도메인 이름으로 역변환하기 위해 생성하는 조회 영역과 레코드는?", scenario: "정방향(도메인→IP)과 반대인 IP→도메인 변환 설정입니다.", choices: ["역방향 조회 영역 - PTR(포인터) 레코드", "정방향 조회 영역 - CNAME 레코드", "역방향 조회 영역 - MX 레코드", "정방향 조회 영역 - A 레코드"], ans: 0, exp: "IP를 도메인으로 역변환할 때는 역방향 조회 영역에 PTR 레코드를 생성합니다." }
+      ]
+    };
+
+    class AppController {
+      constructor() {
+        this.STORAGE_KEY = "NA2_STUDY_MASTER_V2";
+        this.state = this.loadState();
+        this.tFilter = "ALL";
+        this.wSub = "ALL";
+        this.wIdx = 0;
+        this.pSub = "ALL";
+        this.pIdx = 0;
+        this.wMode = "ACTIVE";
+        this.timerSec = 1200;
+        this.bits = [true, true, false, false, false, false, false, false]; // 초기 192 (128+64)
+      }
+
+      defaultState() {
+        return { theories: {}, questions: {}, logs: [] };
+      }
+
+      loadState() {
+        try {
+          const raw = localStorage.getItem(this.STORAGE_KEY);
+          return raw ? { ...this.defaultState(), ...JSON.parse(raw) } : this.defaultState();
+        } catch (_) { return this.defaultState(); }
+      }
+
+      saveState() {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+      }
+
+      getQStat(id) {
+        if (!this.state.questions[id]) {
+          this.state.questions[id] = { solved: 0, correct: 0, wrong: 0, streak: 0, bookmarked: false, mastered: false, lastOk: null };
+        }
+        return this.state.questions[id];
+      }
+
+      recordAttempt(id, isOk, label, title) {
+        const st = this.getQStat(id);
+        st.solved += 1;
+        st.lastOk = isOk;
+        let grad = false;
+        if (isOk) {
+          st.correct += 1;
+          st.streak += 1;
+          if ((st.wrong > 0 || st.bookmarked) && st.streak >= 2 && !st.mastered) {
+            st.mastered = true;
+            st.bookmarked = false;
+            grad = true;
+          }
+        } else {
+          st.wrong += 1;
+          st.streak = 0;
+          st.mastered = false;
+        }
+        this.state.logs.unshift({
+          time: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+          label, id, title: title.slice(0, 38) + "...", isOk, grad
+        });
+        this.state.logs = this.state.logs.slice(0, 50);
+        this.saveState();
+        return { st, grad };
+      }
+
+      recordTheoryQuiz(thId, isOk, title) {
+        this.state.theories[thId] = { solved: true, isOk };
+        this.state.logs.unshift({
+          time: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+          label: "이론퀴즈", id: thId, title, isOk, grad: false
+        });
+        this.saveState();
+      }
+
+      init() {
+        this.bindEvents();
+        this.startTimer();
+        this.runSubnetCalculator();
+        this.renderBits();
+        this.refreshAll();
+      }
+
+      startTimer() {
+        setInterval(() => {
+          this.timerSec -= 1;
+          const abs = Math.abs(this.timerSec);
+          const m = String(Math.floor(abs / 60)).padStart(2, "0");
+          const s = String(abs % 60).padStart(2, "0");
+          document.getElementById("topTimer").textContent = `${this.timerSec < 0 ? "+" : ""}${m}:${s}`;
+        }, 1000);
+      }
+
+      switchTab(tab) {
+        ["dashboard", "theory", "written", "practical", "wrongnote", "records"].forEach(t => {
+          document.getElementById(`view-${t}`).classList.toggle("hidden", t !== tab);
+        });
+        document.querySelectorAll(".main-tab-btn").forEach(btn => {
+          const active = btn.getAttribute("data-tab") === tab;
+          btn.className = active
+            ? "main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white transition flex items-center gap-1.5"
+            : "main-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:bg-slate-800 transition flex items-center gap-1.5";
+        });
+        this.refreshAll();
+      }
+
+      // 실시간 IP 서브넷 계산기 (예: 192.168.100.128 / 26)
+      runSubnetCalculator() {
+        const ipStr = document.getElementById("subnetIpInput").value.trim();
+        const cidr = Math.min(30, Math.max(24, Number(document.getElementById("subnetCidrInput").value) || 26));
+        const parts = ipStr.split(".").map(Number);
+        const box = document.getElementById("subnetResultBox");
+
+        if (parts.length !== 4 || parts.some(n => isNaN(n) || n < 0 || n > 255)) {
+          box.innerHTML = `<p class="text-rose-400">올바른 IPv4 주소를 입력하세요. (예: 192.168.100.128)</p>`;
+          return;
+        }
+
+        const hostBits = 32 - cidr;
+        const blockSize = Math.pow(2, hostBits);
+        const maskOctet = 256 - blockSize;
+        const subnetCount = Math.pow(2, cidr - 24);
+        const usableHosts = Math.max(0, blockSize - 2);
+
+        const netStart = Math.floor(parts[3] / blockSize) * blockSize;
+        const broadcast = netStart + blockSize - 1;
+        const prefix3 = `${parts[0]}.${parts[1]}.${parts[2]}`;
+
+        box.innerHTML = `
+          <div class="flex justify-between border-b border-slate-800 pb-1.5">
+            <span class="text-slate-400">입력 IP / 프리픽스:</span>
+            <strong class="text-indigo-300">${ipStr} / ${cidr}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">서브넷 마스크:</span>
+            <strong class="text-cyan-300">255.255.255.${maskOctet}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">네트워크 ID:</span>
+            <strong class="text-emerald-400">${prefix3}.${netStart}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">브로드캐스트 주소:</span>
+            <strong class="text-amber-300">${prefix3}.${broadcast}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">가용 호스트 범위:</span>
+            <strong class="text-white">${prefix3}.${netStart + 1} ~ .${broadcast - 1}</strong>
+          </div>
+          <div class="flex justify-between pt-1 border-t border-slate-800">
+            <span class="text-slate-400">서브넷 수 / 가용 호스트:</span>
+            <strong class="text-emerald-300">${subnetCount}개 서브넷 / ${usableHosts}개 호스트</strong>
+          </div>
+        `;
+      }
+
+      renderBits() {
+        const vals = [128, 64, 32, 16, 8, 4, 2, 1];
+        const row = document.getElementById("bitToggleRow");
+        row.innerHTML = "";
+        vals.forEach((v, i) => {
+          const on = this.bits[i];
+          const btn = document.createElement("button");
+          btn.className = `py-1.5 rounded-lg font-mono text-xs font-bold border ${on ? "bg-indigo-600 text-white border-indigo-400" : "bg-slate-950 text-slate-500 border-slate-800"}`;
+          btn.innerHTML = `<div>${v}</div><div class="text-[10px]">${on ? "1" : "0"}</div>`;
+          btn.onclick = () => { this.bits[i] = !this.bits[i]; this.renderBits(); };
+          row.appendChild(btn);
+        });
+        const sum = vals.reduce((acc, v, i) => acc + (this.bits[i] ? v : 0), 0);
+        document.getElementById("bitSumVal").textContent = sum;
+      }
+
+      // 연계 이론 + 미니 퀴즈 HTML 생성기
+      buildLinkedTheoryHtml(theoryId, isOk, exp, grad, uid) {
+        const th = DB.theories[theoryId];
+        const banner = isOk
+          ? `<div class="p-4 rounded-xl bg-emerald-950/70 border border-emerald-500/70 text-xs space-y-1">
+               <div class="font-bold text-sm text-emerald-300">🟢 정답입니다! ${grad ? "🎉 (2회 연속 정답으로 오답노트에서 졸업했습니다!)" : ""}</div>
+               <p class="text-slate-200">💡 <strong>해설:</strong> ${exp}</p>
+             </div>`
+          : `<div class="p-4 rounded-xl bg-rose-950/70 border border-rose-500/70 text-xs space-y-1">
+               <div class="font-bold text-sm text-rose-300">🔴 오답입니다! (오답노트에 자동 등록되었습니다 — 아래 연계 이론과 확인 문제를 풀어보세요)</div>
+               <p class="text-slate-200">💡 <strong>해설:</strong> ${exp}</p>
+             </div>`;
+        if (!th) return banner;
+
+        const optsHtml = th.quiz.opts.map((o, i) => `
+          <button data-th="${th.id}" data-idx="${i}" data-uid="${uid}"
+            class="mini-q-btn w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 flex items-center justify-between">
+            <span>${i + 1}. ${o}</span><span class="m-icon"></span>
+          </button>`).join("");
+
+        return `
+          ${banner}
+          <div class="p-5 rounded-2xl bg-indigo-950/40 border border-indigo-700/50 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded bg-indigo-600 text-white text-xs font-bold">🔗 연계 핵심 이론 노트</span>
+              <span class="text-xs font-mono text-indigo-300">${th.categoryName}</span>
+            </div>
+            <h4 class="text-sm font-bold text-white">${th.title}</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">${th.summary}</p>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              ${th.points.map(p => `<li>${p}</li>`).join("")}
+            </ul>
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-700 space-y-2">
+              <p class="text-xs font-bold text-cyan-300">⚡ ${th.quiz.q}</p>
+              <div class="space-y-1.5" id="${uid}_opts">${optsHtml}</div>
+              <p id="${uid}_msg" class="hidden text-xs pt-1"></p>
+            </div>
+          </div>`;
+      }
+
+      bindMiniQuiz(container) {
+        container.querySelectorAll(".mini-q-btn").forEach(btn => {
+          btn.onclick = () => {
+            const thId = btn.getAttribute("data-th");
+            const idx = Number(btn.getAttribute("data-idx"));
+            const uid = btn.getAttribute("data-uid");
+            const th = DB.theories[thId];
+            const isOk = idx === th.quiz.ans;
+            this.recordTheoryQuiz(thId, isOk, th.title);
+
+            const wrap = document.getElementById(`${uid}_opts`);
+            wrap.querySelectorAll(".mini-q-btn").forEach((b, i) => {
+              b.classList.remove("bg-emerald-950", "border-emerald-500", "bg-rose-950", "border-rose-500");
+              if (i === th.quiz.ans) { b.classList.add("bg-emerald-950", "border-emerald-500"); b.querySelector(".m-icon").textContent = "🟢"; }
+              else if (i === idx && !isOk) { b.classList.add("bg-rose-950", "border-rose-500"); b.querySelector(".m-icon").textContent = "🔴"; }
+            });
+            const msg = document.getElementById(`${uid}_msg`);
+            msg.classList.remove("hidden");
+            msg.className = isOk ? "text-xs pt-1 text-emerald-300 font-bold" : "text-xs pt-1 text-rose-300 font-bold";
+            msg.textContent = isOk ? `✅ 정답! ${th.quiz.exp} (이론 정답률에 반영됨)` : `❌ 오답! ${th.quiz.exp}`;
+            this.updateAnalyticsUI();
+          };
+        });
+      }
+
+      updateAnalyticsUI() {
+        const thList = Object.values(DB.theories);
+        let thSolved = 0, thOk = 0;
+        thList.forEach(t => {
+          const r = this.state.theories[t.id];
+          if (r?.solved) { thSolved += 1; if (r.isOk) thOk += 1; }
+        });
+        const thAcc = thSolved > 0 ? Math.round((thOk / thSolved) * 100) : null;
+
+        let wSolved = 0, wOk = 0;
+        DB.written.forEach(q => {
+          const st = this.state.questions[q.id];
+          if (st?.solved > 0) { wSolved += 1; if (st.lastOk) wOk += 1; }
+        });
+        const wAcc = wSolved > 0 ? Math.round((wOk / wSolved) * 100) : null;
+
+        let pSolved = 0, pOk = 0;
+        DB.practical.forEach(q => {
+          const st = this.state.questions[q.id];
+          if (st?.solved > 0) { pSolved += 1; if (st.lastOk) pOk += 1; }
+        });
+        const pAcc = pSolved > 0 ? Math.round((pOk / pSolved) * 100) : null;
+
+        const totalSolved = thSolved + wSolved + pSolved;
+        const totalOk = thOk + wOk + pOk;
+        const totalAcc = totalSolved > 0 ? Math.round((totalOk / totalSolved) * 100) : 0;
+
+        let activeWrong = 0, gradCount = 0;
+        [...DB.written, ...DB.practical].forEach(q => {
+          const st = this.state.questions[q.id];
+          if (!st) return;
+          if (st.mastered) gradCount += 1;
+          else if (st.wrong > 0 || st.bookmarked) activeWrong += 1;
+        });
+
+        // 상단 및 KPI 업데이트
+        document.getElementById("topAccuracy").textContent = `${totalAcc}%`;
+        document.getElementById("topWrongBadge").textContent = activeWrong;
+        document.getElementById("navWrongCount").textContent = activeWrong;
+
+        document.getElementById("kpiAccuracy").textContent = `${totalAcc}%`;
+        document.getElementById("kpiAccuracyDesc").textContent = totalSolved > 0 ? `총 ${totalSolved}문항 중 ${totalOk}문항 정답` : "아직 풀이 기록이 없습니다";
+        document.getElementById("kpiSolvedCount").textContent = this.state.logs.length;
+        document.getElementById("kpiWrongCount").textContent = activeWrong;
+        document.getElementById("kpiGraduatedDesc").textContent = `2회 연속 정답 졸업: ${gradCount}건`;
+        document.getElementById("kpiTheoryDesc").textContent = `이론 확인문제 마스터: ${thOk} / ${thList.length}`;
+        document.getElementById("kpiPassStatus").textContent =
+          totalSolved === 0 ? "학습 대기중" : (totalAcc >= 60 ? "✅ 합격 안정권 (60점+)" : "⚠️ 보완 필요 (60점 미만)");
+
+        // OVERVIEW 대분류(이론/필기/실기) 바 렌더링
+        const mainBars = [
+          { label: "이론 (Theory)", acc: thAcc, detail: `${thOk}/${thList.length} 마스터` },
+          { label: "필기 (Written CBT)", acc: wAcc, detail: `${wOk}/${DB.written.length} 정답` },
+          { label: "실기 (Practical CLI/작업)", acc: pAcc, detail: `${pOk}/${DB.practical.length} 정답` }
+        ];
+        document.getElementById("overviewMainBars").innerHTML = mainBars.map(b => `
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs">
+              <span class="font-bold text-slate-200">${b.label}</span>
+              <span class="font-mono font-bold ${b.acc === null ? "text-slate-500" : (b.acc >= 60 ? "text-emerald-400" : "text-rose-400")}">
+                ${b.acc === null ? "- (미풀이)" : `${b.acc}% (${b.detail})`}
+              </span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+              <div class="h-full transition-all duration-300 ${b.acc >= 60 ? "bg-indigo-500" : "bg-rose-500"}" style="width: ${b.acc || 0}%"></div>
+            </div>
+          </div>`).join("");
+
+        // 세부 과목별 바
+        const subCats = [
+          { name: "1과목: 네트워크 일반", list: DB.written.filter(q => q.sub === "S1_NET") },
+          { name: "2과목: TCP/IP", list: DB.written.filter(q => q.sub === "S2_TCPIP") },
+          { name: "3과목: NOS (Linux/Win)", list: DB.written.filter(q => q.sub === "S3_NOS") },
+          { name: "4과목: 네트워크 운용기기", list: DB.written.filter(q => q.sub === "S4_HW") },
+          { name: "실기: Router CLI & 케이블/서버", list: DB.practical }
+        ];
+        document.getElementById("overviewSubBars").innerHTML = subCats.map(c => {
+          let s = 0, ok = 0;
+          c.list.forEach(q => {
+            const st = this.state.questions[q.id];
+            if (st?.solved > 0) { s += 1; if (st.lastOk) ok += 1; }
+          });
+          const pct = s > 0 ? Math.round((ok / s) * 100) : 0;
+          return `
+            <div class="space-y-1">
+              <div class="flex justify-between">
+                <span class="text-slate-300">${c.name}</span>
+                <span class="font-mono text-slate-400">${pct}% (${ok}/${c.list.length})</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full bg-emerald-500" style="width: ${pct}%"></div>
+              </div>
+            </div>`;
+        }).join("");
+      }
+
+      renderTheoryView() {
+        const list = Object.values(DB.theories).filter(t => this.tFilter === "ALL" ? true : t.category === this.tFilter);
+        const box = document.getElementById("theoryListContainer");
+        box.innerHTML = list.map(th => {
+          const rec = this.state.theories[th.id];
+          const uid = `TH_VIEW_${th.id}`;
+          return `
+            <div class="p-5 rounded-2xl bg-slate-900 border ${rec?.isOk ? "border-emerald-600/50" : "border-slate-800"} flex flex-col justify-between space-y-4">
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-700/50 text-xs font-bold">${th.categoryName}</span>
+                  <span class="text-xs font-bold ${rec?.isOk ? "text-emerald-400" : "text-amber-300"}">${rec?.isOk ? "✅ 마스터 완료" : "📝 확인 문제 대기"}</span>
+                </div>
+                <h4 class="text-base font-bold text-white">${th.title}</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">${th.summary}</p>
+                <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  ${th.points.map(p => `<li>${p}</li>`).join("")}
+                </ul>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <p class="text-xs font-bold text-cyan-300">⚡ ${th.quiz.q}</p>
+                <div class="space-y-1.5" id="${uid}_opts">
+                  ${th.quiz.opts.map((o, i) => `
+                    <button data-th="${th.id}" data-idx="${i}" data-uid="${uid}"
+                      class="mini-q-btn w-full text-left px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 flex items-center justify-between">
+                      <span>${i + 1}. ${o}</span><span class="m-icon"></span>
+                    </button>`).join("")}
+                </div>
+                <p id="${uid}_msg" class="hidden text-xs pt-1"></p>
+              </div>
+            </div>`;
+        }).join("");
+        this.bindMiniQuiz(box);
+      }
+
+      getWrittenList() {
+        const l = DB.written.filter(q => this.wSub === "ALL" ? true : q.sub === this.wSub);
+        return l.length > 0 ? l : DB.written;
+      }
+
+      renderWrittenView() {
+        const list = this.getWrittenList();
+        if (this.wIdx >= list.length) this.wIdx = 0;
+        const q = list[this.wIdx];
+        const st = this.getQStat(q.id);
+
+        document.getElementById("writtenCounter").textContent = `문항 ${this.wIdx + 1} / ${list.length}`;
+        document.getElementById("writtenCatBadge").textContent = q.subName;
+        document.getElementById("writtenStatBadge").textContent = st.solved > 0 ? `풀이 ${st.solved}회 · 오답 ${st.wrong}회 · 연속정답 ${st.streak}회` : "첫 풀이";
+        document.getElementById("btnWrittenBookmark").textContent = st.bookmarked ? "🌟 헷갈림 등록됨" : "⭐ 헷갈림 체크";
+        document.getElementById("writtenQText").textContent = `Q. ${q.q}`;
+
+        const codeBox = document.getElementById("writtenCodeBox");
+        if (q.code) { codeBox.textContent = q.code; codeBox.classList.remove("hidden"); } else { codeBox.classList.add("hidden"); }
+
+        const fb = document.getElementById("writtenFeedbackBox");
+        fb.classList.add("hidden");
+
+        const choicesBox = document.getElementById("writtenChoicesBox");
+        choicesBox.innerHTML = "";
+        const nums = ["①", "②", "③", "④"];
+        q.choices.forEach((c, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "w-full px-4 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left flex items-center justify-between text-sm font-medium text-slate-100";
+          btn.innerHTML = `<span><strong class="mr-2 text-indigo-400">${nums[idx]}</strong>${c}</span><span class="c-icon"></span>`;
+          btn.onclick = () => {
+            const isOk = idx === q.ans;
+            const { grad } = this.recordAttempt(q.id, isOk, "필기", q.q);
+            choicesBox.querySelectorAll("button").forEach((b, i) => {
+              b.classList.remove("bg-slate-800", "border-slate-700", "bg-emerald-950/80", "border-emerald-500", "bg-rose-950/80", "border-rose-500");
+              if (i === q.ans) { b.classList.add("bg-emerald-950/80", "border-emerald-500"); b.querySelector(".c-icon").textContent = "🟢"; }
+              else if (i === idx && !isOk) { b.classList.add("bg-rose-950/80", "border-rose-500"); b.querySelector(".c-icon").textContent = "🔴"; }
+            });
+            fb.innerHTML = this.buildLinkedTheoryHtml(q.theoryId, isOk, q.exp, grad, `W_${q.id}`);
+            fb.classList.remove("hidden");
+            this.bindMiniQuiz(fb);
+            this.updateAnalyticsUI();
+          };
+          choicesBox.appendChild(btn);
+        });
+      }
+
+      getPracticalList() {
+        const l = DB.practical.filter(q => this.pSub === "ALL" ? true : q.pType === this.pSub);
+        return l.length > 0 ? l : DB.practical;
+      }
+
+      renderPracticalView() {
+        const list = this.getPracticalList();
+        if (this.pIdx >= list.length) this.pIdx = 0;
+        const q = list[this.pIdx];
+        const st = this.getQStat(q.id);
+
+        document.getElementById("practicalCounter").textContent = `실습 ${this.pIdx + 1} / ${list.length}`;
+        document.getElementById("practicalCatBadge").textContent = q.pTypeName;
+        document.getElementById("practicalStatBadge").textContent = st.solved > 0 ? `풀이 ${st.solved}회 · 오답 ${st.wrong}회 · 연속정답 ${st.streak}회` : "첫 실습";
+        document.getElementById("btnPracticalBookmark").textContent = st.bookmarked ? "🌟 헷갈림 등록됨" : "⭐ 헷갈림 체크";
+        document.getElementById("practicalQText").textContent = q.q;
+        document.getElementById("practicalScenario").textContent = q.scenario;
+
+        const cliArea = document.getElementById("practicalCliArea");
+        const choiceArea = document.getElementById("practicalChoiceArea");
+        const fb = document.getElementById("practicalFeedbackBox");
+        fb.classList.add("hidden");
+
+        if (q.pType === "CLI_ROUTER" || q.pType === "CLI_LINUX") {
+          cliArea.classList.remove("hidden");
+          choiceArea.classList.add("hidden");
+          document.getElementById("cliPrompt").textContent = q.prompt;
+          const inp = document.getElementById("cliInput");
+          inp.value = "";
+          const hintBox = document.getElementById("cliHintBox");
+          hintBox.classList.add("hidden");
+          hintBox.textContent = `💡 힌트: ${q.hint}`;
+
+          const runEval = () => {
+            const val = inp.value.trim().toLowerCase().replace(/\s+/g, " ");
+            if (!val) return;
+            const isOk = q.cmds.some(c => c.toLowerCase() === val);
+            const { grad } = this.recordAttempt(q.id, isOk, "실기CLI", q.q);
+            fb.innerHTML = this.buildLinkedTheoryHtml(q.theoryId, isOk, `${q.exp} (허용 명령어: ${q.cmds.join(" / ")})`, grad, `P_${q.id}`);
+            fb.classList.remove("hidden");
+            this.bindMiniQuiz(fb);
+            this.updateAnalyticsUI();
+          };
+          document.getElementById("btnEvalCli").onclick = runEval;
+          inp.onkeydown = (e) => { if (e.key === "Enter") runEval(); };
+          document.getElementById("btnHintCli").onclick = () => hintBox.classList.toggle("hidden");
+        } else {
+          cliArea.classList.add("hidden");
+          choiceArea.classList.remove("hidden");
+          choiceArea.innerHTML = "";
+          const nums = ["①", "②", "③", "④"];
+          q.choices.forEach((c, idx) => {
+            const btn = document.createElement("button");
+            btn.className = "w-full px-4 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left flex items-center justify-between text-sm font-medium text-slate-100";
+            btn.innerHTML = `<span><strong class="mr-2 text-cyan-400">${nums[idx]}</strong>${c}</span><span class="c-icon"></span>`;
+            btn.onclick = () => {
+              const isOk = idx === q.ans;
+              const { grad } = this.recordAttempt(q.id, isOk, "실기작업", q.q);
+              choiceArea.querySelectorAll("button").forEach((b, i) => {
+                b.classList.remove("bg-slate-800", "border-slate-700", "bg-emerald-950/80", "border-emerald-500", "bg-rose-950/80", "border-rose-500");
+                if (i === q.ans) { b.classList.add("bg-emerald-950/80", "border-emerald-500"); b.querySelector(".c-icon").textContent = "🟢"; }
+                else if (i === idx && !isOk) { b.classList.add("bg-rose-950/80", "border-rose-500"); b.querySelector(".c-icon").textContent = "🔴"; }
+              });
+              fb.innerHTML = this.buildLinkedTheoryHtml(q.theoryId, isOk, q.exp, grad, `P_${q.id}`);
+              fb.classList.remove("hidden");
+              this.bindMiniQuiz(fb);
+              this.updateAnalyticsUI();
+            };
+            choiceArea.appendChild(btn);
+          });
+        }
+      }
+
+      renderWrongNoteView() {
+        const all = [
+          ...DB.written.map(q => ({ ...q, mode: "written", badge: q.subName })),
+          ...DB.practical.map(q => ({ ...q, mode: "practical", badge: q.pTypeName }))
+        ];
+        const filtered = all.filter(q => {
+          const st = this.state.questions[q.id];
+          if (!st) return false;
+          return this.wMode === "MASTERED" ? st.mastered : (!st.mastered && (st.wrong > 0 || st.bookmarked));
+        });
+        const box = document.getElementById("wrongListBox");
+        if (filtered.length === 0) {
+          box.innerHTML = `<div class="p-8 rounded-2xl bg-slate-900 border border-slate-800 text-center text-sm text-slate-400">등록된 오답 문항이 없습니다. 문제를 풀면서 틀리거나 헷갈림 체크를 해보세요!</div>`;
+          return;
+        }
+        box.innerHTML = filtered.map(q => {
+          const st = this.getQStat(q.id);
+          return `
+            <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded bg-rose-950 text-rose-300 text-xs font-bold">${q.badge} · 오답 ${st.wrong}회 (연속정답 ${st.streak}/2)</span>
+                <button data-id="${q.id}" data-mode="${q.mode}" class="retry-btn px-3.5 py-1.5 rounded-xl bg-indigo-600 text-xs font-bold text-white">다시 풀기 →</button>
+              </div>
+              <p class="text-sm font-bold text-white">${q.q}</p>
+              <p class="text-xs text-emerald-300">💡 핵심 해설: ${q.exp}</p>
+            </div>`;
+        }).join("");
+        box.querySelectorAll(".retry-btn").forEach(btn => {
+          btn.onclick = () => {
+            const id = btn.getAttribute("data-id");
+            const mode = btn.getAttribute("data-mode");
+            if (mode === "written") { this.wSub = "ALL"; this.wIdx = DB.written.findIndex(x => x.id === id); this.switchTab("written"); }
+            else { this.pSub = "ALL"; this.pIdx = DB.practical.findIndex(x => x.id === id); this.switchTab("practical"); }
+          };
+        });
+      }
+
+      renderRecordsView() {
+        const box = document.getElementById("recordsTimelineBox");
+        if (this.state.logs.length === 0) {
+          box.innerHTML = `<div class="p-8 rounded-2xl bg-slate-900 border border-slate-800 text-center text-sm text-slate-400">아직 기록된 로컬 학습 이력이 없습니다.</div>`;
+          return;
+        }
+        box.innerHTML = this.state.logs.map(l => `
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span>${l.isOk ? "🟢" : "🔴"}</span>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-indigo-300 font-bold">${l.label}</span>
+              <span class="text-slate-200 font-medium">${l.title}</span>
+              ${l.grad ? `<span class="px-2 py-0.5 rounded bg-emerald-900 text-emerald-300 font-bold">🎓 오답졸업</span>` : ""}
+            </div>
+            <span class="font-mono text-slate-400">${l.time}</span>
+          </div>`).join("");
+      }
+
+      refreshAll() {
+        this.updateAnalyticsUI();
+        this.renderTheoryView();
+        this.renderWrittenView();
+        this.renderPracticalView();
+        this.renderWrongNoteView();
+        this.renderRecordsView();
+      }
+
+      bindEvents() {
+        document.querySelectorAll(".main-tab-btn").forEach(btn => {
+          btn.onclick = () => this.switchTab(btn.getAttribute("data-tab"));
+        });
+        document.getElementById("btnRunSubnetCalc").onclick = () => this.runSubnetCalculator();
+
+        document.querySelectorAll(".tfilter-btn").forEach(btn => {
+          btn.onclick = () => {
+            this.tFilter = btn.getAttribute("data-tfilter");
+            this.renderTheoryView();
+          };
+        });
+        document.querySelectorAll(".wsub-btn").forEach(btn => {
+          btn.onclick = () => {
+            this.wSub = btn.getAttribute("data-wsub");
+            this.wIdx = 0;
+            this.renderWrittenView();
+          };
+        });
+        document.getElementById("btnWrittenPrev").onclick = () => { if (this.wIdx > 0) { this.wIdx -= 1; this.renderWrittenView(); } };
+        document.getElementById("btnWrittenNext").onclick = () => {
+          const l = this.getWrittenList();
+          if (this.wIdx < l.length - 1) { this.wIdx += 1; this.renderWrittenView(); } else { this.switchTab("dashboard"); }
+        };
+        document.getElementById("btnWrittenBookmark").onclick = () => {
+          const q = this.getWrittenList()[this.wIdx];
+          const st = this.getQStat(q.id);
+          st.bookmarked = !st.bookmarked;
+          this.saveState();
+          this.renderWrittenView();
+          this.updateAnalyticsUI();
+        };
+
+        document.querySelectorAll(".psub-btn").forEach(btn => {
+          btn.onclick = () => {
+            this.pSub = btn.getAttribute("data-psub");
+            this.pIdx = 0;
+            this.renderPracticalView();
+          };
+        });
+        document.getElementById("btnPracticalPrev").onclick = () => { if (this.pIdx > 0) { this.pIdx -= 1; this.renderPracticalView(); } };
+        document.getElementById("btnPracticalNext").onclick = () => {
+          const l = this.getPracticalList();
+          if (this.pIdx < l.length - 1) { this.pIdx += 1; this.renderPracticalView(); } else { this.switchTab("dashboard"); }
+        };
+        document.getElementById("btnPracticalBookmark").onclick = () => {
+          const q = this.getPracticalList()[this.pIdx];
+          const st = this.getQStat(q.id);
+          st.bookmarked = !st.bookmarked;
+          this.saveState();
+          this.renderPracticalView();
+          this.updateAnalyticsUI();
+        };
+
+        document.querySelectorAll(".wmode-btn").forEach(btn => {
+          btn.onclick = () => {
+            this.wMode = btn.getAttribute("data-wmode");
+            this.renderWrongNoteView();
+          };
+        });
+
+        document.getElementById("btnExportJson").onclick = () => {
+          navigator.clipboard?.writeText(JSON.stringify(this.state, null, 2));
+          alert("학습 레코드 JSON이 클립보드에 복사되었습니다!");
+        };
+        document.getElementById("btnImportJson").onclick = () => {
+          const raw = prompt("복원할 JSON 문자열을 붙여넣으세요:");
+          if (raw) {
+            try { this.state = JSON.parse(raw); this.saveState(); this.refreshAll(); alert("복원 완료!"); } catch (_) {}
+          }
+        };
+        document.getElementById("btnResetAll").onclick = () => {
+          if (confirm("모든 학습 기록을 초기화할까요?")) {
+            this.state = this.defaultState();
+            this.saveState();
+            this.refreshAll();
+          }
+        };
+      }
+    }
+
+    const app = new AppController();
+    window.addEventListener("DOMContentLoaded", () => app.init());
+  </script>
+</body>
+</html>
